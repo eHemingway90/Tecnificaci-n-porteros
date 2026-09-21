@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tecnificación Porteros">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0D1526">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Entrenamiento de Tecnificación de Porteros</title>
+<style>
+  :root{
+    --bg:#0D1526;
+    --card:#152140;
+    --card-2:#1B2A4F;
+    --line:#28365C;
+    --amber:#FFB020;
+    --amber-dim:#7A5A20;
+    --teal:#37C9C1;
+    --text:#EAF0FA;
+    --muted:#8AA0C4;
+    --done:#34D399;
+    --danger:#FF6B6B;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  body{
+    padding-bottom: calc(48px + env(safe-area-inset-bottom));
+    padding-top: env(safe-area-inset-top);
+  }
+  .app{max-width:560px; margin:0 auto; padding:0 14px 24px;}
+
+  /* Header */
+  .topbar{ padding:18px 4px 14px; }
+  .brand{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+  .brand h1{
+    font-size:19px; margin:0; font-weight:800; letter-spacing:-0.015em; line-height:1.25;
+  }
+  .brand .sub{ color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .datefield{
+    background:var(--card-2); border:1px solid var(--line); color:var(--amber); font-weight:700;
+    font-size:13px; text-align:right; font-family:inherit; border-radius:8px; padding:6px 10px;
+  }
+  .objective{
+    width:100%; margin-top:12px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; color:var(--text); padding:10px 12px; font-size:14.5px;
+    resize:none; font-family:inherit; min-height:38px;
+  }
+  .objective::placeholder{color:var(--muted);}
+
+  /* Overview bar */
+  .overview{ display:flex; gap:3px; height:8px; border-radius:6px; overflow:hidden; margin:14px 0 6px;}
+  .overview span{display:block; height:100%;}
+  .overview-labels{ display:flex; justify-content:space-between; font-size:10.5px; color:var(--muted); margin-bottom:16px;}
+
+  /* Blocks */
+  .block{ background:var(--card); border:1px solid var(--line); border-radius:16px; margin-bottom:12px; overflow:hidden;}
+  .block-header{
+    width:100%; display:flex; align-items:center; gap:10px; padding:14px 14px;
+    background:transparent; border:none; color:var(--text); text-align:left; font-family:inherit;
+  }
+  .block-num{
+    width:26px; height:26px; border-radius:50%; background:var(--card-2); color:var(--amber);
+    font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .block-title-wrap{flex:1; min-width:0;}
+  .block-title{ font-weight:700; font-size:15.5px; display:block;}
+  .block-target{ font-size:11.5px; color:var(--muted);}
+  .chevron{ color:var(--muted); font-size:13px; transition:transform .2s ease; flex:none;}
+  .block.open .chevron{ transform:rotate(180deg);}
+  .block-body{ display:none; padding:0 14px 16px; border-top:1px solid var(--line);}
+  .block.open .block-body{ display:block; }
+
+  /* Exercises */
+  .exercise-row{
+    display:flex; align-items:flex-start; gap:8px; padding:9px 0; border-bottom:1px solid var(--line);
+  }
+  .exercise-row:last-of-type{ border-bottom:none;}
+  .exercise-row.done .ex-name, .exercise-row.done .ex-reps{ opacity:.45; text-decoration:line-through;}
+  .check{
+    width:22px; height:22px; border-radius:7px; border:2px solid var(--line); flex:none; margin-top:2px;
+    background:transparent; display:flex; align-items:center; justify-content:center; color:var(--done); font-weight:900; font-size:13px;
+  }
+  .check.checked{ background:rgba(52,211,153,0.15); border-color:var(--done);}
+  .ex-fields{ flex:1; display:flex; flex-direction:column; gap:6px; min-width:0;}
+  .ex-name, .ex-reps{
+    background:transparent; border:none; border-bottom:1px solid transparent; color:var(--text);
+    font-size:14px; padding:2px 0; font-family:inherit; width:100%;
+  }
+  .ex-name{ font-weight:600; }
+  .ex-reps{ font-size:12.5px; color:var(--muted);}
+  .ex-name::placeholder, .ex-reps::placeholder{ color:var(--muted); opacity:.7;}
+  .ex-remove{ background:none; border:none; color:var(--muted); font-size:18px; padding:0 2px; flex:none;}
+
+  .ex-video-row{ margin-top:2px; }
+  .vid-btn{ background:none; border:none; color:var(--muted); font-size:11.5px; padding:2px 0; font-family:inherit; font-weight:600;}
+  .vid-btn.set{ color:var(--teal); }
+  .vid-edit{ background:none; border:none; color:var(--muted); font-size:10.5px; text-decoration:underline; padding:0; margin-left:10px; font-family:inherit;}
+
+  .add-exercise{
+    margin-top:10px; width:100%; background:transparent; border:1.5px dashed var(--line); color:var(--amber);
+    border-radius:10px; padding:10px; font-weight:700; font-size:13px; font-family:inherit;
+  }
+  .row-actions{ display:flex; gap:8px; margin-top:10px; }
+  .row-actions .add-exercise{ margin-top:0; }
+  .manage-toggle{
+    margin-top:10px; width:100%; background:transparent; border:1.5px solid var(--line); color:var(--muted);
+    border-radius:10px; padding:10px; font-weight:700; font-size:13px; font-family:inherit;
+  }
+
+  .lib-manager{
+    margin-top:12px; padding-top:12px; border-top:1px dashed var(--line); display:none;
+  }
+  .lib-manager.open{ display:block; }
+  .lib-manager-title{ font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px;}
+  .lib-row{
+    display:flex; align-items:center; gap:6px; padding:6px 0; border-bottom:1px solid var(--line);
+  }
+  .lib-row:last-of-type{ border-bottom:none; }
+  .lib-fields{ flex:1; display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .lib-name, .lib-reps{
+    background:var(--card-2); border:1px solid var(--line); border-radius:7px; color:var(--text);
+    font-size:13px; padding:6px 8px; font-family:inherit; width:100%;
+  }
+  .lib-reps{ font-size:12px; color:var(--muted); }
+  .lib-video{ font-size:12px; color:var(--teal); }
+  .lib-del{ background:none; border:none; color:var(--danger); font-size:18px; padding:0 4px; flex:none; }
+  .lib-add-row{
+    margin-top:10px; width:100%; background:var(--card-2); border:1px solid var(--line); color:var(--amber);
+    border-radius:8px; padding:9px; font-weight:700; font-size:12.5px; font-family:inherit;
+  }
+
+  .picker{
+    margin-top:10px; display:flex; gap:8px;
+  }
+  .picker select{
+    flex:1; background:var(--card-2); border:1px solid var(--line); color:var(--text);
+    border-radius:10px; padding:10px; font-size:13.5px; font-family:inherit; appearance:none;
+    -webkit-appearance:none;
+  }
+  .picker .cancel{
+    background:none; border:none; color:var(--muted); font-size:13px; padding:0 4px; flex:none;
+  }
+  .empty-hint{ color:var(--muted); font-size:12.5px; padding:6px 0 2px;}
+
+  .notes{
+    width:100%; margin-top:14px; background:var(--card-2); border:1px solid var(--line); border-radius:10px;
+    color:var(--text); padding:10px; font-size:13px; font-family:inherit; resize:none; min-height:44px;
+  }
+  .notes::placeholder{ color:var(--muted);}
+
+  .reset-all{
+    display:block; margin:18px auto 0; background:none; border:none; color:var(--muted);
+    font-size:12px; text-decoration:underline; font-family:inherit;
+  }
+
+  .share-section{
+    margin-top:18px; padding:16px; background:var(--card); border:1px solid var(--amber-dim);
+    border-radius:14px;
+  }
+  .generate-btn{
+    width:100%; background:var(--amber); border:none; color:var(--bg); border-radius:10px;
+    padding:12px; font-weight:800; font-size:14px; font-family:inherit;
+  }
+
+  .backup{
+    margin-top:22px; padding-top:16px; border-top:1px solid var(--line);
+  }
+  .backup-title{ font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:8px;}
+  .save-template-btn{
+    width:100%; background:var(--teal); border:none; color:var(--bg); border-radius:10px;
+    padding:12px; font-weight:800; font-size:14px; font-family:inherit; margin-bottom:8px;
+  }
+  .backup-buttons{ display:flex; gap:8px; margin-top:14px; }
+  .backup-buttons button{
+    flex:1; background:var(--card); border:1px solid var(--line); color:var(--text);
+    border-radius:10px; padding:10px; font-weight:700; font-size:12.5px; font-family:inherit;
+  }
+  .backup-area{ display:none; margin-top:10px; }
+  .backup-area.open{ display:block; }
+  .backup-area textarea{
+    width:100%; min-height:90px; background:var(--card-2); border:1px solid var(--line); border-radius:10px;
+    color:var(--text); padding:10px; font-size:11.5px; font-family:ui-monospace, monospace; resize:vertical;
+  }
+  .backup-area .backup-confirm{
+    margin-top:8px; width:100%; background:var(--amber); border:none; color:var(--bg);
+    border-radius:10px; padding:9px; font-weight:800; font-size:12.5px; font-family:inherit;
+  }
+  .backup-note{ font-size:11px; color:var(--muted); margin-top:6px; line-height:1.5; }
+
+  .hint{ text-align:center; color:var(--muted); font-size:11px; margin-top:18px; line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div>
+        <h1>Entrenamiento de Tecnificación de Porteros</h1>
+        <div class="sub">BM. Parla · 2026/2027</div>
+      </div>
+      <input class="datefield" type="date" id="sessionDate">
+    </div>
+    <textarea class="objective" id="objective" placeholder="Objetivo de la sesión…" rows="1"></textarea>
+  </div>
+
+  <div class="overview" id="overview"></div>
+  <div class="overview-labels">
+    <span>0 min</span><span>60 min</span>
+  </div>
+
+  <div class="blocks" id="blocks"></div>
+
+  <div class="share-section">
+    <button id="generatePlayerBtn" class="generate-btn">📤 Generar Entrenamiento</button>
+  </div>
+
+  <button class="reset-all" id="resetAll">Reiniciar toda la sesión</button>
+
+  <div class="backup">
+    <div class="backup-title">Base de datos de ejercicios</div>
+    <button id="saveTemplateBtn" class="save-template-btn">💾 Guardar plantilla</button>
+    <p class="backup-note">Descarga esta misma plantilla con tu base de datos de ejercicios actualizada. Guárdala sustituyendo el archivo que ya tenías (mismo nombre, misma carpeta) y la próxima vez la abrirás ya con tus ejercicios, sin exportar ni importar nada.</p>
+    <p class="backup-note" style="margin-top:14px;">O, si prefieres copiar y pegar en vez de descargar un archivo:</p>
+    <div class="backup-buttons">
+      <button id="exportBtn">⬆️ Exportar copia</button>
+      <button id="importBtn">⬇️ Importar copia</button>
+    </div>
+    <div class="backup-area" id="exportArea">
+      <textarea id="exportText" readonly></textarea>
+      <p class="backup-note">Copia este texto (mantén pulsado → Seleccionar todo → Copiar) y guárdalo en Notas o donde prefieras. La próxima vez que abras esta plantilla, pégalo con "Importar copia" para recuperar tus ejercicios personalizados.</p>
+    </div>
+    <div class="backup-area" id="importArea">
+      <textarea id="importText" placeholder="Pega aquí el texto que exportaste antes…"></textarea>
+      <button class="backup-confirm" id="importConfirm">Cargar en la base de datos</button>
+      <p class="backup-note">Esto sustituye la base de datos actual por la que pegues. Los ejercicios ya añadidos a la sesión de hoy no se ven afectados.</p>
+    </div>
+  </div>
+
+  <div class="hint">Toca un bloque para desplegarlo y "+ Añadir ejercicio" para elegir de la base de datos<br>Consejo: añade esta página a tu pantalla de inicio para abrirla como una app</div>
+</div>
+
+<script>
+// Snapshot of the pristine page, captured before anything is built or edited.
+// Used later by "Guardar plantilla" to produce a fresh copy with only the
+// exercise database updated (session data, dates, notes stay blank).
+const ORIGINAL_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+const BLOCKS = [
+  { title:"Movilidad articular", minutes:8, color:"#37C9C1",
+    library:[
+      {name:"Círculos de tobillo", reps:"2 x 10 por lado"},
+      {name:"Círculos de cadera", reps:"2 x 8 por lado"},
+      {name:"Molinillos de brazos", reps:"2 x 10"},
+      {name:"Movilidad de muñecas", reps:"2 x 10"},
+      {name:"Rotaciones de tronco", reps:"2 x 8 por lado"},
+      {name:"Zancada con rotación de cadera", reps:"2 x 6 por lado"},
+      {name:"Círculos de rodilla", reps:"2 x 8 por lado"},
+      {name:"Movilidad cervical suave", reps:"1 x 8 por lado"},
+      {name:"Apertura de cadera en cuadrupedia", reps:"2 x 8 por lado"},
+      {name:"Skipping suave de activación", reps:"2 x 10 m"},
+    ]},
+  { title:"Calentamiento / Coordinación", minutes:12, color:"#4C8CFF",
+    library:[
+      {name:"Escalera de coordinación (frontal)", reps:"3 x escalera"},
+      {name:"Escalera de coordinación (cruzado/lateral)", reps:"3 x escalera"},
+      {name:"Multisaltos entre conos", reps:"3 x 6 conos"},
+      {name:"Desplazamientos laterales con vallas bajas", reps:"3 x 4 vallas"},
+      {name:"Carrera con cambios de dirección (zig-zag)", reps:"4 x 10 m"},
+      {name:"Coordinación óculo-manual con pelota de reacción", reps:"3 x 10 lanz."},
+      {name:"Skipping + toques de manos", reps:"3 x 15 seg"},
+      {name:"Saltos a la comba", reps:"3 x 30 seg"},
+      {name:"Rebotes con balón medicinal", reps:"3 x 8"},
+      {name:"Equilibrio a la pata coja", reps:"2 x 20 seg por lado"},
+    ]},
+  { title:"Técnica", minutes:20, color:"#FFB020",
+    library:[
+      {name:"Posición base y desplazamientos laterales", reps:"4 x 30 seg", video:""},
+      {name:"Cierre de piernas (paradas bajas)", reps:"3 x 8 rep.", video:""},
+      {name:"Trabajo de brazos (parada alta)", reps:"3 x 8 rep.", video:""},
+      {name:"Salidas y cierre de ángulo", reps:"4 x 6 rep.", video:""},
+      {name:"Recolocación tras parada", reps:"3 x 8 rep.", video:""},
+      {name:"Trabajo de pies en la portería (paso lateral)", reps:"4 x 30 seg", video:""},
+      {name:"Paradas con caída controlada", reps:"3 x 6 por lado", video:""},
+      {name:"Blocaje y control del rebote", reps:"3 x 8 rep.", video:""},
+      {name:"Posicionamiento en 1x1 sin lanzamiento", reps:"4 x 5 rep.", video:""},
+      {name:"Desplazamientos en semicírculo con toque en postes", reps:"3 x 4 rep.", video:""},
+    ]},
+  { title:"Ejercicios con balón", minutes:20, color:"#FF6B6B",
+    library:[
+      {name:"1x1 desde 9 metros", reps:"10-12 lanzamientos", video:""},
+      {name:"Lanzamientos de 6 metros con oposición", reps:"10 lanzamientos", video:""},
+      {name:"Lanzamientos de 7 metros (penaltis)", reps:"8-10 lanzamientos", video:""},
+      {name:"Contraataques con definición", reps:"6-8 repeticiones", video:""},
+      {name:"Lanzamientos cruzados desde extremos", reps:"8 por lado", video:""},
+      {name:"Bloqueo + parada de rebote de compañero", reps:"8 rep.", video:""},
+      {name:"Series a zonas concretas (esquinas)", reps:"10 lanzamientos", video:""},
+      {name:"Situaciones de superioridad (2x1, 3x2)", reps:"5-6 rep.", video:""},
+      {name:"Lanzamientos en suspensión desde lateral", reps:"8-10 lanzamientos", video:""},
+      {name:"Doble esfuerzo: parada + reacción a rebote", reps:"6-8 rep.", video:""},
+    ]},
+];
+
+const blocksEl = document.getElementById('blocks');
+const overviewEl = document.getElementById('overview');
+const totalMinutes = BLOCKS.reduce((s,b)=>s+b.minutes,0);
+
+function buildAll(){
+  blocksEl.innerHTML = '';
+  overviewEl.innerHTML = '';
+  BLOCKS.forEach((block, i)=>{
+  // overview segment
+  const seg = document.createElement('span');
+  seg.style.width = (block.minutes/totalMinutes*100)+'%';
+  seg.style.background = block.color;
+  overviewEl.appendChild(seg);
+
+  const section = document.createElement('section');
+  section.className = 'block' + (i===0 ? ' open':'');
+  section.dataset.index = i;
+
+  section.innerHTML = `
+    <button class="block-header" data-toggle>
+      <span class="block-num">${i+1}</span>
+      <span class="block-title-wrap">
+        <span class="block-title">${block.title}</span>
+        <span class="block-target">≈ ${block.minutes} min</span>
+      </span>
+      <span class="chevron">⌄</span>
+    </button>
+    <div class="block-body">
+      <div class="exercise-list" data-exlist></div>
+      <p class="empty-hint" data-emptyhint>Sin ejercicios todavía. Elige uno de la base de datos.</p>
+      <div class="row-actions">
+        <button class="add-exercise" data-add>+ Añadir ejercicio</button>
+      </div>
+      <div class="picker" data-picker style="display:none">
+        <select data-select></select>
+        <button class="cancel" data-cancel>Cancelar</button>
+      </div>
+      <button class="manage-toggle" data-managetoggle>⚙️ Crear / editar ejercicios de este bloque</button>
+      <div class="lib-manager" data-libmanager>
+        <div class="lib-manager-title">Base de datos · ${block.title}</div>
+        <div data-liblist></div>
+        <button class="lib-add-row" data-libadd>+ Crear ejercicio nuevo</button>
+      </div>
+      <textarea class="notes" placeholder="Notas del bloque…" rows="2"></textarea>
+    </div>
+  `;
+  blocksEl.appendChild(section);
+
+  const exlist = section.querySelector('[data-exlist]');
+  const emptyHint = section.querySelector('[data-emptyhint]');
+  const picker = section.querySelector('[data-picker]');
+  const select = section.querySelector('[data-select]');
+  const addBtn = section.querySelector('[data-add]');
+  const cancelBtn = section.querySelector('[data-cancel]');
+
+  function refreshEmptyHint(){
+    emptyHint.style.display = exlist.children.length ? 'none' : 'block';
+  }
+
+  function addRow(name='', reps='', video=''){
+    const row = document.createElement('div');
+    row.className = 'exercise-row';
+    row.innerHTML = `
+      <button class="check" data-check>✓</button>
+      <div class="ex-fields">
+        <input class="ex-name" type="text" placeholder="Ejercicio" value="${name}">
+        <input class="ex-reps" type="text" placeholder="Series x rep / tiempo" value="${reps}">
+        <div class="ex-video-row" data-vidrow></div>
+      </div>
+      <button class="ex-remove" data-remove>×</button>
+    `;
+    row.querySelector('[data-check]').addEventListener('click', ()=>{
+      row.classList.toggle('done');
+      row.querySelector('[data-check]').classList.toggle('checked');
+    });
+    row.querySelector('[data-remove]').addEventListener('click', ()=>{
+      row.remove();
+      refreshEmptyHint();
+    });
+
+    let currentVideo = video || '';
+    const vidRow = row.querySelector('[data-vidrow]');
+    function renderVideoBtn(){
+      row.dataset.video = currentVideo;
+      vidRow.innerHTML = currentVideo
+        ? `<button class="vid-btn set" data-vidopen>▶️ Ver vídeo</button><button class="vid-edit" data-videdit>editar</button>`
+        : `<button class="vid-btn" data-vidadd>🎥 Añadir vídeo</button>`;
+      if(currentVideo){
+        vidRow.querySelector('[data-vidopen]').addEventListener('click', ()=> window.open(currentVideo, '_blank'));
+        vidRow.querySelector('[data-videdit]').addEventListener('click', ()=>{
+          const val = prompt('Enlace del vídeo (déjalo vacío para quitarlo):', currentVideo);
+          if(val !== null){ currentVideo = val.trim(); renderVideoBtn(); }
+        });
+      } else {
+        vidRow.querySelector('[data-vidadd]').addEventListener('click', ()=>{
+          const val = prompt('Pega el enlace del vídeo (Drive, YouTube, Dropbox…):', '');
+          if(val && val.trim()){ currentVideo = val.trim(); renderVideoBtn(); }
+        });
+      }
+    }
+    renderVideoBtn();
+
+    exlist.appendChild(row);
+    refreshEmptyHint();
+    return row;
+  }
+
+  // build the dropdown from this block's exercise library
+  function renderSelect(){
+    select.innerHTML = '<option value="" disabled selected>Elige un ejercicio…</option>' +
+      block.library.map((ex,idx)=>`<option value="${idx}">${ex.name || '(sin nombre)'}</option>`).join('') +
+      '<option value="custom">✏️ Ejercicio personalizado…</option>';
+  }
+  renderSelect();
+
+  addBtn.addEventListener('click', ()=>{
+    addBtn.style.display = 'none';
+    picker.style.display = 'flex';
+    select.focus();
+  });
+  cancelBtn.addEventListener('click', ()=>{
+    picker.style.display = 'none';
+    addBtn.style.display = 'block';
+    select.value = '';
+  });
+  select.addEventListener('change', ()=>{
+    if(select.value === 'custom'){
+      addRow('', '', '');
+    } else if(select.value !== ''){
+      const ex = block.library[select.value];
+      addRow(ex.name, ex.reps, ex.video || '');
+    }
+    select.value = '';
+    picker.style.display = 'none';
+    addBtn.style.display = 'block';
+  });
+
+  refreshEmptyHint();
+
+  // accordion toggle
+  section.querySelector('[data-toggle]').addEventListener('click', ()=>{
+    section.classList.toggle('open');
+  });
+
+  // --- database manager: create / edit / delete library exercises ---
+  const manageToggle = section.querySelector('[data-managetoggle]');
+  const libManager = section.querySelector('[data-libmanager]');
+  const libList = section.querySelector('[data-liblist]');
+  const libAddBtn = section.querySelector('[data-libadd]');
+
+  manageToggle.addEventListener('click', ()=>{
+    libManager.classList.toggle('open');
+  });
+
+  function renderLibManager(){
+    libList.innerHTML = '';
+    block.library.forEach((ex, idx)=>{
+      const row = document.createElement('div');
+      row.className = 'lib-row';
+      row.innerHTML = `
+        <div class="lib-fields">
+          <input class="lib-name" type="text" placeholder="Nombre del ejercicio" value="${ex.name}">
+          <input class="lib-reps" type="text" placeholder="Series x rep / tiempo" value="${ex.reps}">
+          <input class="lib-video" type="url" placeholder="Enlace de vídeo (opcional)" value="${ex.video || ''}">
+        </div>
+        <button class="lib-del" title="Eliminar de la base de datos">×</button>
+      `;
+      const nameInput = row.querySelector('.lib-name');
+      const repsInput = row.querySelector('.lib-reps');
+      const videoInput = row.querySelector('.lib-video');
+      nameInput.addEventListener('input', ()=>{ ex.name = nameInput.value; renderSelect(); });
+      repsInput.addEventListener('input', ()=>{ ex.reps = repsInput.value; });
+      videoInput.addEventListener('input', ()=>{ ex.video = videoInput.value; });
+      row.querySelector('.lib-del').addEventListener('click', ()=>{
+        block.library.splice(idx,1);
+        renderLibManager();
+        renderSelect();
+      });
+      libList.appendChild(row);
+    });
+  }
+  libAddBtn.addEventListener('click', ()=>{
+    block.library.push({name:'', reps:'', video:''});
+    renderLibManager();
+    renderSelect();
+    const inputs = libList.querySelectorAll('.lib-name');
+    if(inputs.length) inputs[inputs.length-1].focus();
+  });
+  renderLibManager();
+  });
+}
+buildAll();
+
+document.getElementById('resetAll').addEventListener('click', ()=>{
+  if(confirm('¿Reiniciar toda la sesión? Se borrará lo añadido hoy (ejercicios seleccionados y notas) y también los cambios sin exportar en la base de datos.')){
+    location.reload();
+  }
+});
+
+document.getElementById('sessionDate').valueAsDate = new Date();
+
+// --- backup / restore the whole exercise database as text ---
+const exportBtn = document.getElementById('exportBtn');
+const importBtn = document.getElementById('importBtn');
+const exportArea = document.getElementById('exportArea');
+const importArea = document.getElementById('importArea');
+const exportText = document.getElementById('exportText');
+const importText = document.getElementById('importText');
+const importConfirm = document.getElementById('importConfirm');
+
+exportBtn.addEventListener('click', ()=>{
+  importArea.classList.remove('open');
+  exportArea.classList.toggle('open');
+  const dump = BLOCKS.map(b => ({ title:b.title, library:b.library }));
+  exportText.value = JSON.stringify(dump);
+  exportText.select();
+});
+importBtn.addEventListener('click', ()=>{
+  exportArea.classList.remove('open');
+  importArea.classList.toggle('open');
+});
+importConfirm.addEventListener('click', ()=>{
+  try{
+    const data = JSON.parse(importText.value.trim());
+    if(!Array.isArray(data)) throw new Error('formato inválido');
+    data.forEach((saved, i)=>{
+      if(BLOCKS[i] && Array.isArray(saved.library)){
+        BLOCKS[i].library = saved.library.filter(ex => ex && typeof ex.name === 'string');
+      }
+    });
+    buildAll();
+    importArea.classList.remove('open');
+    alert('Base de datos cargada correctamente.');
+  }catch(e){
+    alert('El texto pegado no es una copia válida. Revisa que lo hayas copiado completo.');
+  }
+});
+
+// --- save template: download a fresh copy of this whole page with the
+// current exercise database baked in as the new default (session fields,
+// dates and notes stay blank, exactly like the original file) ---
+function triggerDownload(content, filename){
+  const blob = new Blob([content], { type:'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('saveTemplateBtn').addEventListener('click', ()=>{
+  const newBlocksData = BLOCKS.map(b => ({
+    title: b.title, minutes: b.minutes, color: b.color, library: b.library,
+  }));
+  const newArraySource = 'const BLOCKS = ' + JSON.stringify(newBlocksData, null, 2) + ';';
+  const blocksRegex = /const BLOCKS = \[[\s\S]*?\n\];/;
+  if(!blocksRegex.test(ORIGINAL_HTML)){
+    alert('No se ha podido generar la plantilla. Usa "Exportar copia" como alternativa.');
+    return;
+  }
+  const newHtml = ORIGINAL_HTML.replace(blocksRegex, newArraySource);
+  const currentName = decodeURIComponent(location.pathname.split('/').pop() || '');
+  const filename = currentName && currentName.endsWith('.html') ? currentName : 'entrenamiento_tecnificacion_porteros.html';
+  triggerDownload(newHtml, filename);
+  alert('Plantilla descargada. Guárdala en el mismo sitio que la anterior (elige "Reemplazar" si te lo pregunta) para que la próxima vez se abra ya con tu base de datos actualizada.');
+});
+
+// --- generate a read-only version of today's session to send to players ---
+function escapeHtml(str){
+  return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function collectSessionData(){
+  const dateVal = document.getElementById('sessionDate').value;
+  const objective = document.getElementById('objective').value;
+  const blocksData = BLOCKS.map((block, i)=>{
+    const section = blocksEl.children[i];
+    const notes = section.querySelector('.notes').value;
+    const rows = [...section.querySelectorAll('.exercise-row')].map(row => ({
+      name: row.querySelector('.ex-name').value,
+      reps: row.querySelector('.ex-reps').value,
+      video: row.dataset.video || '',
+    })).filter(r => r.name.trim() !== '');
+    return { title: block.title, minutes: block.minutes, color: block.color, notes, rows };
+  });
+  return { date: dateVal, objective, blocks: blocksData };
+}
+
+function buildPlayerHTML(session){
+  const totalMin = session.blocks.reduce((s,b)=>s+b.minutes,0);
+  const dateLabel = session.date
+    ? new Date(session.date + 'T00:00:00').toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' })
+    : '';
+
+  const overviewSegs = session.blocks.map(b =>
+    `<span style="width:${(b.minutes/totalMin*100)}%; background:${b.color};"></span>`
+  ).join('');
+
+  const blocksHtml = session.blocks.map((b, i) => `
+    <section class="block${i===0?' open':''}">
+      <button class="block-header" data-toggle>
+        <span class="block-num">${i+1}</span>
+        <span class="block-title-wrap">
+          <span class="block-title">${escapeHtml(b.title)}</span>
+          <span class="block-target">≈ ${b.minutes} min</span>
+        </span>
+        <span class="chevron">⌄</span>
+      </button>
+      <div class="block-body">
+        ${b.rows.length ? b.rows.map(r => `
+          <div class="exercise-row">
+            <button class="check" data-check>✓</button>
+            <div class="ex-fields">
+              <div class="ex-name">${escapeHtml(r.name)}</div>
+              <div class="ex-reps">${escapeHtml(r.reps)}</div>
+              ${r.video ? `<div class="ex-video-row"><a class="vid-btn set" href="${escapeHtml(r.video)}" target="_blank" rel="noopener">▶️ Ver vídeo</a></div>` : ''}
+            </div>
+          </div>
+        `).join('') : `<p class="empty-hint">Sin ejercicios en este bloque.</p>`}
+        ${b.notes.trim() ? `<div class="block-note"><strong>Notas del entrenador:</strong> ${escapeHtml(b.notes)}</div>` : ''}
+      </div>
+    </section>
+  `).join('');
+
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tecnificación Porteros">
+<title>Entrenamiento de Tecnificación de Porteros${dateLabel ? ' · ' + dateLabel : ''}</title>
+<style>
+  :root{ --bg:#0D1526; --card:#152140; --card-2:#1B2A4F; --line:#28365C; --amber:#FFB020; --teal:#37C9C1;
+    --text:#EAF0FA; --muted:#8AA0C4; --done:#34D399; }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased;}
+  body{ padding-bottom:calc(40px + env(safe-area-inset-bottom)); padding-top:env(safe-area-inset-top);}
+  .app{max-width:560px; margin:0 auto; padding:0 14px 24px;}
+  .topbar{ padding:18px 4px 14px; }
+  .badge{ display:inline-block; background:var(--card-2); color:var(--teal); font-size:11px; font-weight:700;
+    padding:4px 10px; border-radius:20px; margin-bottom:8px; }
+  h1{ font-size:19px; margin:0 0 4px; font-weight:800; letter-spacing:-0.015em; line-height:1.25;}
+  .sub{ color:var(--muted); font-size:12.5px;}
+  .objective{ margin-top:12px; background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:10px 12px; font-size:14.5px; color:var(--text); }
+  .overview{ display:flex; gap:3px; height:8px; border-radius:6px; overflow:hidden; margin:14px 0 6px;}
+  .overview span{ display:block; height:100%; }
+  .overview-labels{ display:flex; justify-content:space-between; font-size:10.5px; color:var(--muted); margin-bottom:16px;}
+  .block{ background:var(--card); border:1px solid var(--line); border-radius:16px; margin-bottom:12px; overflow:hidden;}
+  .block-header{ width:100%; display:flex; align-items:center; gap:10px; padding:14px; background:transparent;
+    border:none; color:var(--text); text-align:left; font-family:inherit; }
+  .block-num{ width:26px; height:26px; border-radius:50%; background:var(--card-2); color:var(--amber);
+    font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; flex:none;}
+  .block-title-wrap{flex:1; min-width:0;}
+  .block-title{ font-weight:700; font-size:15.5px; display:block;}
+  .block-target{ font-size:11.5px; color:var(--muted);}
+  .chevron{ color:var(--muted); font-size:13px; transition:transform .2s ease; flex:none;}
+  .block.open .chevron{ transform:rotate(180deg);}
+  .block-body{ display:none; padding:0 14px 16px; border-top:1px solid var(--line);}
+  .block.open .block-body{ display:block; }
+  .exercise-row{ display:flex; align-items:flex-start; gap:8px; padding:9px 0; border-bottom:1px solid var(--line);}
+  .exercise-row:last-of-type{ border-bottom:none;}
+  .exercise-row.done .ex-name, .exercise-row.done .ex-reps{ opacity:.45; text-decoration:line-through;}
+  .check{ width:22px; height:22px; border-radius:7px; border:2px solid var(--line); flex:none; margin-top:2px;
+    background:transparent; display:flex; align-items:center; justify-content:center; color:var(--done); font-weight:900; font-size:13px;}
+  .check.checked{ background:rgba(52,211,153,0.15); border-color:var(--done);}
+  .ex-fields{ flex:1; min-width:0;}
+  .ex-name{ font-weight:600; font-size:14px;}
+  .ex-reps{ font-size:12.5px; color:var(--muted); margin-top:2px;}
+  .ex-video-row{ margin-top:4px;}
+  .vid-btn{ color:var(--teal); font-size:11.5px; font-weight:700; text-decoration:none;}
+  .empty-hint{ color:var(--muted); font-size:12.5px; padding:10px 0;}
+  .block-note{ margin-top:12px; background:var(--card-2); border-radius:10px; padding:10px 12px; font-size:12.5px; color:var(--text); line-height:1.5;}
+  .readonly-note{ text-align:center; color:var(--muted); font-size:11px; margin-top:18px; line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <span class="badge">🔒 Solo lectura</span>
+    <h1>Entrenamiento de Tecnificación de Porteros</h1>
+    <div class="sub">BM. Parla · 2026/2027${dateLabel ? ' · ' + dateLabel : ''}</div>
+    ${session.objective.trim() ? `<div class="objective">${escapeHtml(session.objective)}</div>` : ''}
+  </div>
+  <div class="overview">${overviewSegs}</div>
+  <div class="overview-labels"><span>0 min</span><span>${totalMin} min</span></div>
+  ${blocksHtml}
+  <div class="readonly-note">Puedes desplegar cada bloque y marcar los ejercicios como hechos ✓ mientras entrenas.<br>Esta rutina la ha preparado tu entrenador y no se puede editar.</div>
+</div>
+<script>
+document.querySelectorAll('[data-toggle]').forEach(btn=>{
+  btn.addEventListener('click', ()=> btn.closest('.block').classList.toggle('open'));
+});
+document.querySelectorAll('[data-check]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    btn.closest('.exercise-row').classList.toggle('done');
+    btn.classList.toggle('checked');
+  });
+});
+<\/script>
+</body>
+</html>`;
+}
+
+document.getElementById('generatePlayerBtn').addEventListener('click', ()=>{
+  const session = collectSessionData();
+  const totalExercises = session.blocks.reduce((s,b)=>s+b.rows.length,0);
+  if(totalExercises === 0){
+    alert('Añade al menos un ejercicio a la sesión antes de generar la versión para jugadores.');
+    return;
+  }
+  const html = buildPlayerHTML(session);
+  const fileDate = session.date || 'sin-fecha';
+  triggerDownload(html, `Sesion_Porteros_${fileDate}.html`);
+});
+</script>
+</body>
+</html>

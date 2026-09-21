@@ -1,0 +1,9 @@
+{
+  "name": "Tecnificación Porteros",
+  "short_name": "Porteros",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0D1526",
+  "theme_color": "#0D1526",
+  "lang": "es"
+}

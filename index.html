@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
+<html lang="es"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tecnificación Porteros">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0D1526">
-<link rel="manifest" href="manifest.webmanifest">
 <title>Entrenamiento de Tecnificación de Porteros</title>
 <style>
   :root{
@@ -233,7 +229,7 @@
       <button id="importBtn">⬇️ Importar copia</button>
     </div>
     <div class="backup-area" id="exportArea">
-      <textarea id="exportText" readonly></textarea>
+      <textarea id="exportText" readonly=""></textarea>
       <p class="backup-note">Copia este texto (mantén pulsado → Seleccionar todo → Copiar) y guárdalo en Notas o donde prefieras. La próxima vez que abras esta plantilla, pégalo con "Importar copia" para recuperar tus ejercicios personalizados.</p>
     </div>
     <div class="backup-area" id="importArea">
@@ -253,58 +249,189 @@
 const ORIGINAL_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 
 const BLOCKS = [
-  { title:"Movilidad articular", minutes:8, color:"#37C9C1",
-    library:[
-      {name:"Círculos de tobillo", reps:"2 x 10 por lado"},
-      {name:"Círculos de cadera", reps:"2 x 8 por lado"},
-      {name:"Molinillos de brazos", reps:"2 x 10"},
-      {name:"Movilidad de muñecas", reps:"2 x 10"},
-      {name:"Rotaciones de tronco", reps:"2 x 8 por lado"},
-      {name:"Zancada con rotación de cadera", reps:"2 x 6 por lado"},
-      {name:"Círculos de rodilla", reps:"2 x 8 por lado"},
-      {name:"Movilidad cervical suave", reps:"1 x 8 por lado"},
-      {name:"Apertura de cadera en cuadrupedia", reps:"2 x 8 por lado"},
-      {name:"Skipping suave de activación", reps:"2 x 10 m"},
-    ]},
-  { title:"Calentamiento / Coordinación", minutes:12, color:"#4C8CFF",
-    library:[
-      {name:"Escalera de coordinación (frontal)", reps:"3 x escalera"},
-      {name:"Escalera de coordinación (cruzado/lateral)", reps:"3 x escalera"},
-      {name:"Multisaltos entre conos", reps:"3 x 6 conos"},
-      {name:"Desplazamientos laterales con vallas bajas", reps:"3 x 4 vallas"},
-      {name:"Carrera con cambios de dirección (zig-zag)", reps:"4 x 10 m"},
-      {name:"Coordinación óculo-manual con pelota de reacción", reps:"3 x 10 lanz."},
-      {name:"Skipping + toques de manos", reps:"3 x 15 seg"},
-      {name:"Saltos a la comba", reps:"3 x 30 seg"},
-      {name:"Rebotes con balón medicinal", reps:"3 x 8"},
-      {name:"Equilibrio a la pata coja", reps:"2 x 20 seg por lado"},
-    ]},
-  { title:"Técnica", minutes:20, color:"#FFB020",
-    library:[
-      {name:"Posición base y desplazamientos laterales", reps:"4 x 30 seg", video:""},
-      {name:"Cierre de piernas (paradas bajas)", reps:"3 x 8 rep.", video:""},
-      {name:"Trabajo de brazos (parada alta)", reps:"3 x 8 rep.", video:""},
-      {name:"Salidas y cierre de ángulo", reps:"4 x 6 rep.", video:""},
-      {name:"Recolocación tras parada", reps:"3 x 8 rep.", video:""},
-      {name:"Trabajo de pies en la portería (paso lateral)", reps:"4 x 30 seg", video:""},
-      {name:"Paradas con caída controlada", reps:"3 x 6 por lado", video:""},
-      {name:"Blocaje y control del rebote", reps:"3 x 8 rep.", video:""},
-      {name:"Posicionamiento en 1x1 sin lanzamiento", reps:"4 x 5 rep.", video:""},
-      {name:"Desplazamientos en semicírculo con toque en postes", reps:"3 x 4 rep.", video:""},
-    ]},
-  { title:"Ejercicios con balón", minutes:20, color:"#FF6B6B",
-    library:[
-      {name:"1x1 desde 9 metros", reps:"10-12 lanzamientos", video:""},
-      {name:"Lanzamientos de 6 metros con oposición", reps:"10 lanzamientos", video:""},
-      {name:"Lanzamientos de 7 metros (penaltis)", reps:"8-10 lanzamientos", video:""},
-      {name:"Contraataques con definición", reps:"6-8 repeticiones", video:""},
-      {name:"Lanzamientos cruzados desde extremos", reps:"8 por lado", video:""},
-      {name:"Bloqueo + parada de rebote de compañero", reps:"8 rep.", video:""},
-      {name:"Series a zonas concretas (esquinas)", reps:"10 lanzamientos", video:""},
-      {name:"Situaciones de superioridad (2x1, 3x2)", reps:"5-6 rep.", video:""},
-      {name:"Lanzamientos en suspensión desde lateral", reps:"8-10 lanzamientos", video:""},
-      {name:"Doble esfuerzo: parada + reacción a rebote", reps:"6-8 rep.", video:""},
-    ]},
+  {
+    "title": "Movilidad articular",
+    "minutes": 8,
+    "color": "#37C9C1",
+    "library": [
+      {
+        "name": "Rotación de tobillos",
+        "reps": "10 x lado",
+        "video": ""
+      },
+      {
+        "name": "Rodilla a pared (movilidad de tobillo)",
+        "reps": "10 x lado",
+        "video": ""
+      },
+      {
+        "name": "Rotación de cadera en suelo.",
+        "reps": "Abriendo (10 x lado) / Cerrando (10 x lado) / A-C (12 rep)",
+        "video": ""
+      }
+    ]
+  },
+  {
+    "title": "Calentamiento / Coordinación",
+    "minutes": 12,
+    "color": "#4C8CFF",
+    "library": [
+      {
+        "name": "Escalera de coordinación (frontal)",
+        "reps": "3 x escalera"
+      },
+      {
+        "name": "Escalera de coordinación (cruzado/lateral)",
+        "reps": "3 x escalera"
+      },
+      {
+        "name": "Multisaltos entre conos",
+        "reps": "3 x 6 conos"
+      },
+      {
+        "name": "Desplazamientos laterales con vallas bajas",
+        "reps": "3 x 4 vallas"
+      },
+      {
+        "name": "Carrera con cambios de dirección (zig-zag)",
+        "reps": "4 x 10 m"
+      },
+      {
+        "name": "Coordinación óculo-manual con pelota de reacción",
+        "reps": "3 x 10 lanz."
+      },
+      {
+        "name": "Skipping + toques de manos",
+        "reps": "3 x 15 seg"
+      },
+      {
+        "name": "Saltos a la comba",
+        "reps": "3 x 30 seg"
+      },
+      {
+        "name": "Rebotes con balón medicinal",
+        "reps": "3 x 8"
+      },
+      {
+        "name": "Equilibrio a la pata coja",
+        "reps": "2 x 20 seg por lado"
+      }
+    ]
+  },
+  {
+    "title": "Técnica",
+    "minutes": 20,
+    "color": "#FFB020",
+    "library": [
+      {
+        "name": "Posición base y desplazamientos laterales",
+        "reps": "4 x 30 seg",
+        "video": ""
+      },
+      {
+        "name": "Cierre de piernas (paradas bajas)",
+        "reps": "3 x 8 rep.",
+        "video": ""
+      },
+      {
+        "name": "Trabajo de brazos (parada alta)",
+        "reps": "3 x 8 rep.",
+        "video": ""
+      },
+      {
+        "name": "Salidas y cierre de ángulo",
+        "reps": "4 x 6 rep.",
+        "video": ""
+      },
+      {
+        "name": "Recolocación tras parada",
+        "reps": "3 x 8 rep.",
+        "video": ""
+      },
+      {
+        "name": "Trabajo de pies en la portería (paso lateral)",
+        "reps": "4 x 30 seg",
+        "video": ""
+      },
+      {
+        "name": "Paradas con caída controlada",
+        "reps": "3 x 6 por lado",
+        "video": ""
+      },
+      {
+        "name": "Blocaje y control del rebote",
+        "reps": "3 x 8 rep.",
+        "video": ""
+      },
+      {
+        "name": "Posicionamiento en 1x1 sin lanzamiento",
+        "reps": "4 x 5 rep.",
+        "video": ""
+      },
+      {
+        "name": "Desplazamientos en semicírculo con toque en postes",
+        "reps": "3 x 4 rep.",
+        "video": ""
+      }
+    ]
+  },
+  {
+    "title": "Ejercicios con balón",
+    "minutes": 20,
+    "color": "#FF6B6B",
+    "library": [
+      {
+        "name": "1x1 desde 9 metros",
+        "reps": "10-12 lanzamientos",
+        "video": ""
+      },
+      {
+        "name": "Lanzamientos de 6 metros con oposición",
+        "reps": "10 lanzamientos",
+        "video": ""
+      },
+      {
+        "name": "Lanzamientos de 7 metros (penaltis)",
+        "reps": "8-10 lanzamientos",
+        "video": ""
+      },
+      {
+        "name": "Contraataques con definición",
+        "reps": "6-8 repeticiones",
+        "video": ""
+      },
+      {
+        "name": "Lanzamientos cruzados desde extremos",
+        "reps": "8 por lado",
+        "video": ""
+      },
+      {
+        "name": "Bloqueo + parada de rebote de compañero",
+        "reps": "8 rep.",
+        "video": ""
+      },
+      {
+        "name": "Series a zonas concretas (esquinas)",
+        "reps": "10 lanzamientos",
+        "video": ""
+      },
+      {
+        "name": "Situaciones de superioridad (2x1, 3x2)",
+        "reps": "5-6 rep.",
+        "video": ""
+      },
+      {
+        "name": "Lanzamientos en suspensión desde lateral",
+        "reps": "8-10 lanzamientos",
+        "video": ""
+      },
+      {
+        "name": "Doble esfuerzo: parada + reacción a rebote",
+        "reps": "6-8 rep.",
+        "video": ""
+      }
+    ]
+  }
 ];
 
 const blocksEl = document.getElementById('blocks');
@@ -727,6 +854,4 @@ document.getElementById('generatePlayerBtn').addEventListener('click', ()=>{
   const fileDate = session.date || 'sin-fecha';
   triggerDownload(html, `Sesion_Porteros_${fileDate}.html`);
 });
-</script>
-</body>
-</html>
+</script></body></html>
